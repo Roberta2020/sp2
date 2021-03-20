@@ -11,7 +11,6 @@
 <a href= 'index.php'>Employees</a>
 <a href= 'projects.php'>Projects</a>
 </header>
-
 <?php
     //---- Mysqli installation
     $servername = "localhost";
@@ -28,7 +27,7 @@
     }
     
     // ------ Table data to associative array
-    $sql = "SELECT id, employer FROM employees";
+    $sql = "SELECT id, project FROM projects";
     $result = mysqli_query($conn, $sql);
 
     if (mysqli_num_rows($result) > 0) {
@@ -36,15 +35,15 @@
                     <thead>
                         <tr>
                             <th>Id</th>
+                            <th>Project</th>
                             <th>Employer</th>
-                            <th>Projects</th>
                             <th>Actions</th>
                     </thead>
                     <tbody>');
         while($row = mysqli_fetch_assoc($result)) {
         print(          '<tr>
                             <td>' . $row["id"] . '</td>
-                            <td>' . $row["employer"] . '</td>
+                            <td>' . $row["project"] . '</td>
                         </tr>');
         }
         print(     '</tbody>
