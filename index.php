@@ -30,7 +30,7 @@
 <?php
 //-------- Delete
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        $id = $_POST['submit'];
+        $id = $_POST['delete_emp'];
         if (!empty($id)) {
           $sql = 'DELETE FROM employees WHERE id = ?';
           $stmt = $conn->prepare($sql);
@@ -114,7 +114,7 @@
                             <td>' . $row["project"] . '</td>
                             <td>' . 
                                 '<form action="'. $_SERVER['PHP_SELF'] .'" method="post">
-                                    <button type="submit" name="submit" class="btn btn-outline-primary btn-sm" value="'. $row['id'] .'">Delete</button>
+                                    <button type="submit" name="delete_emp" class="btn btn-outline-primary btn-sm" value="'. $row['id'] .'">Delete</button>
                                     <button type="button" name="submit" class="btn btn-primary btn-sm"">Update</button>
                                 </form>' .  
                             '</td>
