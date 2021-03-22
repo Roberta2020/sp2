@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
     <title>Document</title>
 </head>
 <body>
@@ -11,6 +12,7 @@
 <a href= 'index.php'>Employees</a>
 <a href= 'projects.php'>Projects</a>
 </header>
+<div class="container">
 <?php
     //---- Mysqli installation
     $servername = "localhost";
@@ -62,12 +64,17 @@
 ?>
 <?php
     // ------ Table data to associative array
-    $sql = "SELECT projects.id, projects.project FROM projects";
+    $sql = "SELECT projects.id, projects.project, projects.employees_id,
+            GROUP_CONCAT(employees.employer separator \", \") as em_id
+            FROM projects
+            LEFT JOIN employees
+            ON projects.employees_id = employees.id
+            GROUP BY projects.id";
     $result = mysqli_query($conn, $sql);
 
     if (mysqli_num_rows($result) > 0) {
-        print('<table>
-                    <thead>
+        print('<table class="table">
+                    <thead class="table-header">
                         <tr>
                             <th>Id</th>
                             <th>Project</th>
@@ -80,7 +87,7 @@
         print(          '<tr>
                             <td>' . $i . '</td>
                             <td>' . $row["project"] . '</td>
-                            <td>' . $row["employer"] . '</td>
+                            <td>' . $row["em_id"] . '</td>
                             <td>' . 
                                 '<form action="'. $_SERVER['PHP_SELF'] .'" method="post">
                                     <button type="submit" name="delete_pro" class="btn btn-outline-primary btn-sm" value="'. $row['id'] .'">Delete</button>
@@ -91,7 +98,8 @@
     $i++;
         }
         print(     '</tbody>
-              </table>');
+              </table>
+</div>');
     } else {
     echo '0 results';
     }

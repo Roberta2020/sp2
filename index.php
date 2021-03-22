@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
     <title>Document</title>
 </head>
 <body>
@@ -11,7 +12,7 @@
 <a href= 'index.php'>Employees</a>
 <a href= 'projects.php'>Projects</a>
 </header>
-
+<div class="container">
 <?php
     //---- Mysqli installation
     $servername = "localhost";
@@ -61,43 +62,20 @@
         }
     }
 ?>
-<?php
-    // --------- Update
-    if(isset($_POST['update_emp'])){
-            $sql = ('UPDATE employees SET `employer`=?, `projects_id`=? WHERE `id`=?');
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param('sii', $employer, $projects_id, $id);
-            $employer = $_POST['employer'];
-            $projects_id = $_POST['projects_id'] === '' ? null : $_POST['projects_id'];
-            $id = $_POST['id'];
-            $res = $stmt->execute();
-            $stmt->close();
-            mysqli_close($conn);
-            header("Location: ?path=employees");
-            die();
-    }
-    
-    //   if (isset($_POST['update-emp'])) {
-        // $stmt = $conn->prepare("UPDATE emploees SET `firstname`=?, `lastname`=?, `pid`=? WHERE `id`=?");
-        // $stmt->bind_param("ssii", $firstname, $lastname, $pid, $eid);
-        // $firstname = $_POST['firstname'];
-        // $lastname = $_POST['lastname'];
-        // $pid = $_POST['project-id'] === '' ? null : $_POST['project-id'];
-        // $eid = $_POST['employee-id'];
-        // $stmt->execute();
-    //   }
-?>
+
 <?php
     // ------ Table data
-    $sql = "SELECT employees.id, employees.employer, employees.projects_id, projects.project AS pr_id 
+    $sql = "SELECT employees.id, employees.employer, employees.projects_id,  
+            GROUP_CONCAT(projects.project separator \", \") as pr_id
             FROM employees
             LEFT JOIN projects
-            ON employees.projects_id = projects.id;";
+            ON employees.projects_id = projects.id
+            GROUP BY employees.id;";
     $result = mysqli_query($conn, $sql);
     
     if (mysqli_num_rows($result) > 0) {
-        print('<table>
-                    <thead>
+        print('<table class="table">
+                    <thead class="table-header">
                         <tr>
                             <th>Id</th>
                             <th>Employer</th>
@@ -115,15 +93,17 @@
                             <td>' . 
                                 '<form action="'. $_SERVER['PHP_SELF'] .'" method="post">
                                     <button type="submit" name="delete_emp" class="btn btn-outline-primary btn-sm" value="'. $row['id'] .'">Delete</button>
-                                    <button type="submit" name="update_emp" class="btn btn-primary btn-sm"">Update</button>
-                                </form>' .  
+                                    <button>
+                                        <a href="?path=employees&update_emp='. $row['id'].'" type="button" name="submit" class="btn btn-primary btn-sm">Update</a></button>    
+                                    </form>' .  
                             '</td>
                         </tr>'); 
                             
     $i++;
         }
         print(     '</tbody>
-              </table>');
+              </table>
+</div>');
     } else {
     echo '0 results';
     }
@@ -133,16 +113,69 @@
   <input type="text" name="employer" value="<?php echo $row['employer'] ?>" placeholder="Insert new employer name" Required>
   <input type="submit" name="insert_emp" value="Add">
 </form>
-<!-- Update employer -->
-<form method="POST">
-    <label>Employer name</label>
-    <input type='text' id='employer' name='employer' placeholder='Employer name' value="<?php echo $row['employer'] ?>">
-    <label>Project</label>
-    <select id='projects_id' name='projects_id'>
-    <option value=''>None</option>
-    <option value='1'>Project 1</option>
-    </select>
-</form>
+
+<?php if(isset($_GET["update_emp"])): ?>
+                <?php $id = $_GET["update_emp"]; ?>
+           <form method="post" action="<?php echo $_SERVER['PHP_SELF'];?>?path=employees">  
+          
+<?php 
+$sql = 'SELECT employer FROM Employees 
+        WHERE id = '. $id;
+        $result = mysqli_query($conn, $sql);
+
+        if (mysqli_num_rows($result) > 0) {
+            while($row = mysqli_fetch_assoc($result)) {
+                echo '<div class="container">
+                <div class="row">
+                 <div class="col-4">
+                <input type="text" name="update_emp" class="form-control" id="employer" placeholder="" value="'. $row['employer'] .'">
+                </div>
+                </div>
+                </div>';
+            }
+        } 
+        ?>
+
+        <div class="container">
+            <div class="row">
+                <div class="col-4">
+                    <select class="form-select" aria-label="Default select example">
+                        <option selected>Projects</option>
+<?php
+                $sql ='SELECT projects.id, projects.project
+                       FROM Projects';
+                $result = mysqli_query($conn, $sql);
+ 
+                if (mysqli_num_rows($result) > 0) {
+                    while($row = mysqli_fetch_assoc($result)) {
+                    echo '<option value="'.$row['id'].'">'.$row['projects.project'].'</option>';
+                    }
+                } else {
+                    echo 'no records';
+                }
+?>
+                </div>
+            </div>
+        </div>
+
+<?php
+              if ($_SERVER["REQUEST_METHOD"] == "POST") {
+                $update_emp = $_POST['update_emp'];
+              }
+?>
+
+<?php
+    $sql = 'UPDATE employee set id=' . $_POST['id'] .',
+                                employer=' . $_POST['employer'] . ',
+                                WHERE id=' . $_POST['id'] . ');'
+               
+?>
+
+        </select>
+               <form method="post" action="<?php echo $_SERVER['PHP_SELF'];?>?path=employees"> 
+                  <button type="submit" name="update_emp" class="btn btn-primary">Update</button>
+                  </form>
+    <?php endif; ?>
 <?php
     // ----- Disconnection
     mysqli_close($conn);
