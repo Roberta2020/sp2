@@ -15,7 +15,7 @@ This is my second PHP task - CRUD Project Manager
 
   - Clone the repository;
   - Open the files php interpreter;
-  - Import 'Dump20210322.sql.sql' script into local SQL Server and create a database
+  - Import dumps' script into local SQL Server and create a database
   - Launch using localhost
 
 ## Author
